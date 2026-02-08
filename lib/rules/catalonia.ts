@@ -20,8 +20,8 @@ const rules: Rule[] = [
   {
     id: 'min-useful-area',
     name: 'Superfície útil mínima',
-    description: 'La superfície útil mínima per a una segona ocupació és de 36 m²',
-    evidenceNeeded: ['usefulArea'],
+    description: 'La superfície útil mínima varia segons el tipus d\'ocupació',
+    evidenceNeeded: ['usefulArea', 'useCase'],
     evaluate: (input) => {
       if (!input.usefulArea || input.usefulArea <= 0) {
         return {
@@ -33,20 +33,40 @@ const rules: Rule[] = [
         };
       }
       
-      if (input.usefulArea >= 36) {
+      // Determine minimum area based on use case (Decret 141/2012)
+      let minimumArea: number;
+      let useCaseName: string;
+      
+      if (input.useCase === 'primera-ocupacion') {
+        minimumArea = 30;
+        useCaseName = 'primera ocupació';
+      } else if (input.useCase === 'segunda-ocupacion') {
+        minimumArea = 36;
+        useCaseName = 'segona ocupació';
+      } else if (input.useCase === 'renovation') {
+        // For renovation, use the stricter standard (36 m²)
+        minimumArea = 36;
+        useCaseName = 'renovació';
+      } else {
+        // Default to segunda ocupación standard
+        minimumArea = 36;
+        useCaseName = 'segona ocupació';
+      }
+      
+      if (input.usefulArea >= minimumArea) {
         return {
           severity: 'pass',
           message: `Superfície útil adequada: ${input.usefulArea} m²`,
-          explanation: `La superfície útil de ${input.usefulArea} m² compleix el mínim de 36 m² requerit.`,
+          explanation: `La superfície útil de ${input.usefulArea} m² compleix el mínim de ${minimumArea} m² requerit per a ${useCaseName}.`,
           confidence: 100,
         };
       }
       
       return {
         severity: 'fail',
-        message: `Superfície útil insuficient: ${input.usefulArea} m² (mínim: 36 m²)`,
-        explanation: `La superfície útil de ${input.usefulArea} m² és inferior al mínim de 36 m² requerit per a una segona ocupació.`,
-        fixGuidance: 'No es pot solucionar sense modificar l\'habitatge. Es requereix una superfície mínima de 36 m².',
+        message: `Superfície útil insuficient: ${input.usefulArea} m² (mínim: ${minimumArea} m² per a ${useCaseName})`,
+        explanation: `La superfície útil de ${input.usefulArea} m² és inferior al mínim de ${minimumArea} m² requerit per a ${useCaseName}.`,
+        fixGuidance: `No es pot solucionar sense modificar l'habitatge. Es requereix una superfície mínima de ${minimumArea} m² per a ${useCaseName}.`,
         confidence: 100,
       };
     },
