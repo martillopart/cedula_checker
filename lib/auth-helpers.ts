@@ -3,19 +3,26 @@ import { authOptions } from './auth';
 import { loadUser } from './db-users';
 
 export async function getCurrentUser() {
-  const session = await getServerSession(authOptions);
-  
-  if (!session?.user) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      return null;
+    }
+    
+    // Type assertion for user.id (added in JWT callback)
+    const userId = (session.user as any).id;
+    if (!userId) {
+      return null;
+    }
+    
+    return loadUser(userId);
+  } catch (error) {
+    // If there's an error getting the session (e.g., NEXTAUTH_SECRET not set),
+    // return null instead of throwing
+    console.error('Error getting current user:', error);
     return null;
   }
-  
-  // Type assertion for user.id (added in JWT callback)
-  const userId = (session.user as any).id;
-  if (!userId) {
-    return null;
-  }
-  
-  return loadUser(userId);
 }
 
 export async function requireAuth() {

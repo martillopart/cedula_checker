@@ -195,6 +195,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (propertyInput.numFloors !== undefined) {
+      const numFloorsValidation = validatePositiveNumber(propertyInput.numFloors, 'Number of floors', 1, 50);
+      if (!numFloorsValidation.valid) {
+        return NextResponse.json(
+          { error: numFloorsValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+
     if (propertyInput.yearBuilt !== undefined) {
       const currentYear = new Date().getFullYear();
       const yearBuiltValidation = validatePositiveNumber(propertyInput.yearBuilt, 'Year built', 1000, currentYear);
@@ -263,6 +273,107 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate new detailed requirement boolean fields (optional)
+    if (propertyInput.hasRunningWater !== undefined) {
+      const hasRunningWaterValidation = validateBoolean(propertyInput.hasRunningWater, 'hasRunningWater');
+      if (!hasRunningWaterValidation.valid) {
+        return NextResponse.json(
+          { error: hasRunningWaterValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (propertyInput.hasHotWater !== undefined) {
+      const hasHotWaterValidation = validateBoolean(propertyInput.hasHotWater, 'hasHotWater');
+      if (!hasHotWaterValidation.valid) {
+        return NextResponse.json(
+          { error: hasHotWaterValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (propertyInput.hasDrainage !== undefined) {
+      const hasDrainageValidation = validateBoolean(propertyInput.hasDrainage, 'hasDrainage');
+      if (!hasDrainageValidation.valid) {
+        return NextResponse.json(
+          { error: hasDrainageValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (propertyInput.hasWC !== undefined) {
+      const hasWCValidation = validateBoolean(propertyInput.hasWC, 'hasWC');
+      if (!hasWCValidation.valid) {
+        return NextResponse.json(
+          { error: hasWCValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (propertyInput.hasShowerOrBath !== undefined) {
+      const hasShowerOrBathValidation = validateBoolean(propertyInput.hasShowerOrBath, 'hasShowerOrBath');
+      if (!hasShowerOrBathValidation.valid) {
+        return NextResponse.json(
+          { error: hasShowerOrBathValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (propertyInput.hasCookingAppliance !== undefined) {
+      const hasCookingApplianceValidation = validateBoolean(propertyInput.hasCookingAppliance, 'hasCookingAppliance');
+      if (!hasCookingApplianceValidation.valid) {
+        return NextResponse.json(
+          { error: hasCookingApplianceValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (propertyInput.hasElectricalInstallation !== undefined) {
+      const hasElectricalInstallationValidation = validateBoolean(propertyInput.hasElectricalInstallation, 'hasElectricalInstallation');
+      if (!hasElectricalInstallationValidation.valid) {
+        return NextResponse.json(
+          { error: hasElectricalInstallationValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (propertyInput.hasEnergyCertificate !== undefined) {
+    const hasEnergyCertificateValidation = validateBoolean(propertyInput.hasEnergyCertificate, 'hasEnergyCertificate');
+    if (!hasEnergyCertificateValidation.valid) {
+      return NextResponse.json(
+        { error: hasEnergyCertificateValidation.error },
+        { status: 400 }
+      );
+    }
+
+    if (propertyInput.hasGas !== undefined) {
+      const hasGasValidation = validateBoolean(propertyInput.hasGas, 'hasGas');
+      if (!hasGasValidation.valid) {
+        return NextResponse.json(
+          { error: hasGasValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (propertyInput.hasGasInstallation !== undefined) {
+      const hasGasInstallationValidation = validateBoolean(propertyInput.hasGasInstallation, 'hasGasInstallation');
+      if (!hasGasInstallationValidation.valid) {
+        return NextResponse.json(
+          { error: hasGasInstallationValidation.error },
+          { status: 400 }
+        );
+      }
+    }
+    }
+
     // Evaluate property (use provided evaluationResult if available, otherwise evaluate)
     let evaluationResult: EvaluationResult;
     if (providedEvaluationResult && providedEvaluationResult.rules && Array.isArray(providedEvaluationResult.rules)) {
@@ -318,8 +429,11 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error saving case:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error('Error details:', { errorMessage, errorStack });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: process.env.NODE_ENV === 'development' ? errorMessage : undefined },
       { status: 500 }
     );
   }
