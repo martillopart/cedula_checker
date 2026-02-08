@@ -5,11 +5,17 @@ import { loadUser } from './db-users';
 export async function getCurrentUser() {
   const session = await getServerSession(authOptions);
   
-  if (!session?.user?.id) {
+  if (!session?.user) {
     return null;
   }
   
-  return loadUser(session.user.id);
+  // Type assertion for user.id (added in JWT callback)
+  const userId = (session.user as any).id;
+  if (!userId) {
+    return null;
+  }
+  
+  return loadUser(userId);
 }
 
 export async function requireAuth() {
