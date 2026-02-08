@@ -83,6 +83,7 @@ export interface PropertyInput {
   numRooms?: number;
   numBedrooms?: number;
   numBathrooms?: number;
+  numFloors?: number; // Number of floors (for access requirements)
   
   // Facilities
   hasKitchen: boolean;
@@ -90,6 +91,26 @@ export interface PropertyInput {
   hasNaturalLight: boolean;
   hasVentilation: boolean;
   hasHeating: boolean;
+  
+  // Detailed Kitchen Requirements (Decret 141/2012)
+  hasRunningWater?: boolean; // Aigua corrent
+  hasHotWater?: boolean; // Aigua calenta
+  hasDrainage?: boolean; // Sistema de desguàs
+  hasCookingAppliance?: boolean; // Aparell de cocció (fogó/llar de foc)
+  
+  // Detailed Bathroom Requirements (Decret 141/2012)
+  hasWC?: boolean; // Vàter
+  hasShowerOrBath?: boolean; // Dutxa o banyera
+  
+  // Electrical Installation (Decret 141/2012)
+  hasElectricalInstallation?: boolean; // Instal·lació elèctrica conforme
+  
+  // Energy Efficiency (CTE - Código Técnico de la Edificación)
+  hasEnergyCertificate?: boolean; // Certificat energètic (advertència, no bloquejant)
+  
+  // Gas Installation (Decret 141/2012 - if applicable)
+  hasGas?: boolean; // Si l'habitatge té gas
+  hasGasInstallation?: boolean; // Instal·lació de gas conforme i segura
   
   // Occupancy
   intendedOccupancy?: number; // number of people

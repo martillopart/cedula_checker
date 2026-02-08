@@ -19,6 +19,17 @@ export default function Home() {
     hasNaturalLight: false,
     hasVentilation: false,
     hasHeating: false,
+    // New detailed requirements
+    hasRunningWater: false,
+    hasHotWater: false,
+    hasDrainage: false,
+    hasWC: false,
+    hasShowerOrBath: false,
+    hasCookingAppliance: false,
+    hasElectricalInstallation: false,
+    hasEnergyCertificate: false,
+    hasGas: false,
+    hasGasInstallation: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,11 +58,23 @@ export default function Home() {
         numRooms: formData.numRooms,
         numBedrooms: formData.numBedrooms,
         numBathrooms: formData.numBathrooms,
+        numFloors: formData.numFloors,
         hasKitchen: formData.hasKitchen || false,
         hasBathroom: formData.hasBathroom || false,
         hasNaturalLight: formData.hasNaturalLight || false,
         hasVentilation: formData.hasVentilation || false,
         hasHeating: formData.hasHeating || false,
+        // New detailed requirements
+        hasRunningWater: formData.hasRunningWater,
+        hasHotWater: formData.hasHotWater,
+        hasDrainage: formData.hasDrainage,
+        hasWC: formData.hasWC,
+        hasShowerOrBath: formData.hasShowerOrBath,
+        hasCookingAppliance: formData.hasCookingAppliance,
+        hasElectricalInstallation: formData.hasElectricalInstallation,
+        hasEnergyCertificate: formData.hasEnergyCertificate,
+        hasGas: formData.hasGas,
+        hasGasInstallation: formData.hasGasInstallation,
         intendedOccupancy: formData.intendedOccupancy,
         notes: formData.notes,
       };
@@ -276,6 +299,21 @@ export default function Home() {
                     placeholder="2"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nombre de Pisos
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.numFloors || ''}
+                    onChange={(e) => updateField('numFloors', e.target.value ? parseInt(e.target.value) : undefined)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="1"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Per a validar els requisits d'accés i circulació</p>
+                </div>
               </div>
             </div>
 
@@ -303,6 +341,136 @@ export default function Home() {
                     <span className="ml-2 text-sm text-gray-700">{label}</span>
                   </label>
                 ))}
+              </div>
+            </div>
+
+            {/* Detailed Kitchen Requirements */}
+            <div className="border-b border-gray-200 pb-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Detalls de la Cuina
+              </h2>
+              <p className="text-sm text-gray-600 mb-3">
+                Requisits obligatoris per a la cédula de habitabilitat
+              </p>
+              <div className="space-y-3">
+                {[
+                  { key: 'hasRunningWater', label: 'Té aigua corrent' },
+                  { key: 'hasDrainage', label: 'Té sistema de desguàs' },
+                  { key: 'hasCookingAppliance', label: 'Té aparell de cocció (fogó/llar de foc)' },
+                ].map(({ key, label }) => (
+                  <label key={key} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData[key as keyof PropertyInput] as boolean || false}
+                      onChange={(e) => updateField(key as keyof PropertyInput, e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Detailed Bathroom Requirements */}
+            <div className="border-b border-gray-200 pb-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Detalls del Bany
+              </h2>
+              <p className="text-sm text-gray-600 mb-3">
+                Requisits obligatoris per a la cédula de habitabilitat
+              </p>
+              <div className="space-y-3">
+                {[
+                  { key: 'hasWC', label: 'Té vàter (inodoro)' },
+                  { key: 'hasShowerOrBath', label: 'Té dutxa o banyera' },
+                ].map(({ key, label }) => (
+                  <label key={key} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData[key as keyof PropertyInput] as boolean || false}
+                      onChange={(e) => updateField(key as keyof PropertyInput, e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Water Supply and Electrical */}
+            <div className="border-b border-gray-200 pb-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Subministraments i Instal·lacions
+              </h2>
+              <div className="space-y-3">
+                {[
+                  { key: 'hasHotWater', label: 'Té aigua calenta' },
+                  { key: 'hasElectricalInstallation', label: 'Té instal·lació elèctrica conforme' },
+                ].map(({ key, label }) => (
+                  <label key={key} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData[key as keyof PropertyInput] as boolean || false}
+                      onChange={(e) => updateField(key as keyof PropertyInput, e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Energy Efficiency */}
+            <div className="border-b border-gray-200 pb-6">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Eficiència Energètica
+              </h2>
+              <p className="text-sm text-gray-600 mb-3">
+                Recomanat per al CTE (Código Técnico de la Edificación)
+              </p>
+              <div className="space-y-3">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasEnergyCertificate || false}
+                    onChange={(e) => updateField('hasEnergyCertificate', e.target.checked)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Té certificat d'eficiència energètic</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Gas Installation Section */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                Instal·lació de Gas (si aplica)
+              </h2>
+              <p className="text-sm text-gray-600 mb-3">
+                Només si l'habitatge té instal·lació de gas
+              </p>
+              <div className="space-y-3">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasGas || false}
+                    onChange={(e) => updateField('hasGas', e.target.checked)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">L'habitatge té instal·lació de gas</span>
+                </label>
+                
+                {formData.hasGas && (
+                  <label className="flex items-center ml-6">
+                    <input
+                      type="checkbox"
+                      checked={formData.hasGasInstallation || false}
+                      onChange={(e) => updateField('hasGasInstallation', e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Instal·lació de gas conforme i segura (amb ventilació adequada)</span>
+                  </label>
+                )}
               </div>
             </div>
 

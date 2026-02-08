@@ -29,43 +29,239 @@ A web-based tool for checking property requirements for the cédula de habitabil
 ### Prerequisites
 - Node.js 18+
 - npm or yarn
+- Git (for deployment)
 
 ### Installation
 
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd cedula
-```
-
-2. Install dependencies:
+1. **Install Dependencies:**
 ```bash
 npm install
 ```
 
-3. Set up environment variables (optional):
-```bash
-# Create .env.local file
-NEXTAUTH_SECRET=your-secret-key-change-in-production
+2. **Set Up Environment Variables (Optional but Recommended):**
+Create a file named `.env.local` in the root directory:
+
+```env
+# Required for NextAuth.js (use a random string in production)
+NEXTAUTH_SECRET=your-secret-key-change-in-production-12345
 NEXTAUTH_URL=http://localhost:3000
 
-# For Gmail/Google OAuth (optional but recommended)
+# Optional: For Google OAuth login
+# Get these from: https://console.cloud.google.com/apis/credentials
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
 
-4. Run the development server:
+**Note:** 
+- For development, you can use any string for `NEXTAUTH_SECRET` (e.g., `dev-secret-key-12345`)
+- Google OAuth is optional - the app works without it (email/password auth will still work)
+- The app will create data files automatically in the `data/` directory
+
+3. **Run the Development Server:**
 ```bash
 npm run dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+4. **Open the Application:**
+Open your browser and navigate to: `http://localhost:3000`
 
 ### Building for Production
 ```bash
 npm run build
 npm start
 ```
+
+## Deployment - Get Your URL Up and Running
+
+Follow these steps to deploy your application to Vercel and get a live URL.
+
+### Step 1: Configure Git Identity
+
+Run these PowerShell commands to set up your Git identity:
+
+```powershell
+# Set your name (replace "Your Name" with your actual name or GitHub username)
+git config --global user.name "Your Name"
+
+# Set your email (replace with your GitHub email)
+git config --global user.email "your.email@example.com"
+
+# Verify it's set correctly
+git config user.name
+git config user.email
+```
+
+### Step 2: Create GitHub Repository (Manual Step)
+
+**You need to do this in a browser first:**
+
+1. Go to: https://github.com/new
+2. Repository name: `cedula`
+3. Choose Public or Private
+4. **DO NOT** check README, .gitignore, or license
+5. Click "Create repository"
+6. **Copy your repository URL** (e.g., `https://github.com/YOUR_USERNAME/cedula.git`)
+
+### Step 3: Connect to GitHub and Push
+
+```powershell
+# Navigate to project directory (if not already there)
+cd C:\Users\marti\Desktop\cedula
+
+# Add GitHub as remote (replace YOUR_USERNAME with your GitHub username)
+git remote add origin https://github.com/YOUR_USERNAME/cedula.git
+
+# If you get "remote origin already exists", remove it first:
+# git remote remove origin
+# git remote add origin https://github.com/YOUR_USERNAME/cedula.git
+
+# Rename branch to main
+git branch -M main
+
+# Push to GitHub
+git push -u origin main
+```
+
+**If prompted for credentials:**
+- Username: Your GitHub username
+- Password: Use a **Personal Access Token** (not your GitHub password)
+  - Get token from: https://github.com/settings/tokens
+  - Click "Generate new token (classic)"
+  - Select "repo" scope
+  - Copy the token and use it as password
+
+### Step 4: Generate Secure Secret for Environment Variables
+
+```powershell
+# Generate a secure random secret for NEXTAUTH_SECRET
+-join ((48..57) + (65..90) + (97..122) | Get-Random -Count 32 | ForEach-Object {[char]$_})
+```
+
+**Copy the output** - you'll need it for Vercel!
+
+### Step 5: Deploy to Vercel (Manual Steps in Browser)
+
+**You need to do this in a browser:**
+
+1. Go to: https://vercel.com/signup
+2. Sign up with GitHub
+3. Click "Add New Project"
+4. Import your `cedula` repository
+5. **Add Environment Variables:**
+   - Click "Environment Variables"
+   - Add `NEXTAUTH_SECRET` = (paste the secret from Step 4)
+   - Add `NEXTAUTH_URL` = `https://your-project-name.vercel.app` (use the URL Vercel shows)
+   - Click "Save" for each
+6. Click "Deploy"
+7. Wait 2-3 minutes
+8. **Get your URL** from the deployment page!
+
+### Step 6: Update NEXTAUTH_URL (After Getting Your URL)
+
+Once you have your Vercel URL (e.g., `https://cedula-xxxxx.vercel.app`):
+
+1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables
+2. Update `NEXTAUTH_URL` to your actual Vercel URL
+3. Go to Deployments tab
+4. Click "..." on latest deployment → "Redeploy"
+
+### Quick Copy-Paste Script (All Commands Together)
+
+```powershell
+# ============================================
+# COMPLETE DEPLOYMENT SCRIPT
+# ============================================
+# Replace YOUR_USERNAME and your.email@example.com before running!
+
+# Step 1: Configure Git
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+
+# Step 2: Navigate to project
+cd C:\Users\marti\Desktop\cedula
+
+# Step 3: Connect to GitHub (replace YOUR_USERNAME)
+git remote add origin https://github.com/YOUR_USERNAME/cedula.git
+git branch -M main
+
+# Step 4: Generate secret
+Write-Host "`n=== GENERATED SECRET (copy this) ===" -ForegroundColor Green
+-join ((48..57) + (65..90) + (97..122) | Get-Random -Count 32 | ForEach-Object {[char]$_})
+Write-Host "====================================`n" -ForegroundColor Green
+
+# Step 5: Push to GitHub
+Write-Host "Pushing to GitHub..." -ForegroundColor Yellow
+Write-Host "If prompted, use Personal Access Token as password" -ForegroundColor Yellow
+git push -u origin main
+
+Write-Host "`n✅ Code pushed to GitHub!" -ForegroundColor Green
+Write-Host "`nNext steps:" -ForegroundColor Cyan
+Write-Host "1. Go to https://vercel.com/signup" -ForegroundColor White
+Write-Host "2. Sign up with GitHub" -ForegroundColor White
+Write-Host "3. Import your repository" -ForegroundColor White
+Write-Host "4. Add environment variables (use the secret above)" -ForegroundColor White
+Write-Host "5. Deploy!" -ForegroundColor White
+```
+
+### Troubleshooting Commands
+
+**If "remote origin already exists":**
+```powershell
+git remote remove origin
+git remote add origin https://github.com/YOUR_USERNAME/cedula.git
+```
+
+**If push fails with authentication:**
+```powershell
+# Check current remote
+git remote -v
+
+# Generate new Personal Access Token at:
+# https://github.com/settings/tokens
+# Then use it as password when pushing
+```
+
+**If you need to check git status:**
+```powershell
+git status
+git log --oneline
+```
+
+**If you need to verify build works:**
+```powershell
+npm run build
+```
+
+### After Deployment - Test Your URL
+
+Once you have your Vercel URL, test it:
+
+```powershell
+# Open in browser (replace with your actual URL)
+Start-Process "https://your-project-name.vercel.app"
+```
+
+### Summary: What You Need
+
+1. ✅ **GitHub account** (create at github.com if needed)
+2. ✅ **GitHub repository** (create at github.com/new)
+3. ✅ **Vercel account** (sign up at vercel.com)
+4. ✅ **Personal Access Token** (from github.com/settings/tokens)
+
+### Expected Timeline
+
+- **Git setup**: 1 minute
+- **Push to GitHub**: 2-3 minutes
+- **Vercel deployment**: 5 minutes
+- **Total**: ~10 minutes to get your URL!
+
+### Your URL Will Be
+
+After deployment, you'll get:
+- **Vercel URL**: `https://cedula-xxxxx.vercel.app` (or similar)
+- **HTTPS**: Automatic ✅
+- **SSL**: Free ✅
+- **Ready to share**: Yes! 🎉
 
 ## Tech Stack
 
@@ -153,8 +349,17 @@ npm start
 
 Evaluates properties against Catalonia's cédula de habitabilidad requirements (Decret 141/2012):
 - Minimum useful area (30 m² for primera ocupación, 36 m² for segunda ocupación/renovation)
-- Minimum ceiling height (2.5m)
+- Minimum ceiling height (2.5m for habitable spaces)
+- Minimum room size (6 m² per room for separate rooms, 8 m² if single space)
 - Required facilities (kitchen, bathroom)
+- **Kitchen details**: Running water, drainage system, cooking appliance (stove/fireplace)
+- **Bathroom details**: WC (toilet), shower or bathtub, running water, drainage
+- **Water supply**: Running water and hot water connection
+- **Drainage system**: Proper wastewater evacuation system
+- **Electrical installation**: Compliant electrical system
+- **Gas installation**: Safe and compliant gas installation (if applicable, with adequate ventilation)
+- **Energy efficiency certificate**: Energy performance certificate (CTE - recommended, not blocking)
+- **Access and circulation**: Safe access for multi-story buildings (stairs, door width ≥0.8m, corridor width ≥1.2m)
 - Natural light and ventilation
 - Occupancy density (9 m² per person minimum)
 - Minimum number of rooms
