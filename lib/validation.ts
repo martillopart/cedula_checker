@@ -41,11 +41,11 @@ export function sanitizeStringWithLimit(input: string | undefined | null, maxLen
  */
 export function validateMunicipality(municipality: string | undefined | null): ValidationResult {
   if (!municipality || typeof municipality !== 'string') {
-    return { valid: false, error: 'Municipality is required' };
+    return { valid: false, error: 'El camp "Municipi" és obligatori' };
   }
   const sanitized = sanitizeStringWithLimit(municipality, 100);
   if (sanitized.length < 2 || sanitized.length > 100) {
-    return { valid: false, error: 'Municipality must be between 2 and 100 characters' };
+    return { valid: false, error: 'El municipi ha de tenir entre 2 i 100 caràcters' };
   }
   return { valid: true };
 }
@@ -55,11 +55,11 @@ export function validateMunicipality(municipality: string | undefined | null): V
  */
 export function validateRegion(region: string | undefined | null): ValidationResult {
   if (!region || typeof region !== 'string') {
-    return { valid: false, error: 'Region is required' };
+    return { valid: false, error: 'El camp "Regió" és obligatori' };
   }
   const sanitized = sanitizeStringWithLimit(region, 100);
   if (sanitized.length < 2 || sanitized.length > 100) {
-    return { valid: false, error: 'Region must be between 2 and 100 characters' };
+    return { valid: false, error: 'La regió ha de tenir entre 2 i 100 caràcters' };
   }
   return { valid: true };
 }
@@ -70,10 +70,10 @@ export function validateRegion(region: string | undefined | null): ValidationRes
 export function validatePropertyType(propertyType: string | undefined | null): ValidationResult {
   const validTypes = ['flat', 'house', 'studio', 'other'];
   if (!propertyType || typeof propertyType !== 'string') {
-    return { valid: false, error: 'Property type is required' };
+    return { valid: false, error: 'El camp "Tipus de Propietat" és obligatori' };
   }
   if (!validTypes.includes(propertyType)) {
-    return { valid: false, error: 'Invalid property type' };
+    return { valid: false, error: 'Tipus de propietat no vàlid' };
   }
   return { valid: true };
 }
@@ -84,10 +84,10 @@ export function validatePropertyType(propertyType: string | undefined | null): V
 export function validateUseCase(useCase: string | undefined | null): ValidationResult {
   const validUseCases = ['segunda-ocupacion', 'primera-ocupacion', 'renovation'];
   if (!useCase || typeof useCase !== 'string') {
-    return { valid: false, error: 'Use case is required' };
+    return { valid: false, error: 'El camp "Ús" és obligatori' };
   }
   if (!validUseCases.includes(useCase)) {
-    return { valid: false, error: 'Invalid use case' };
+    return { valid: false, error: 'Ús no vàlid' };
   }
   return { valid: true };
 }

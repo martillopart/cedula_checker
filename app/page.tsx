@@ -35,9 +35,29 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields
-    if (!formData.municipality || !formData.propertyType || !formData.useCase) {
-      alert('Si us plau, omple tots els camps obligatoris.');
+    // Validate required fields with specific error messages
+    const missingFields: string[] = [];
+    
+    if (!formData.municipality || formData.municipality.trim() === '') {
+      missingFields.push('Municipi');
+    }
+    
+    if (!formData.propertyType) {
+      missingFields.push('Tipus de Propietat');
+    }
+    
+    if (!formData.useCase) {
+      missingFields.push('Ús');
+    }
+    
+    // Region has a default value, but validate it's not empty
+    if (!formData.region || formData.region.trim() === '') {
+      missingFields.push('Regió');
+    }
+    
+    if (missingFields.length > 0) {
+      const fieldsList = missingFields.join(', ');
+      alert(`Si us plau, omple els següents camps obligatoris: ${fieldsList}`);
       return;
     }
 
