@@ -152,11 +152,12 @@ npm start
 ## Rules Engine
 
 Evaluates properties against Catalonia's cédula de habitabilidad requirements (Decret 141/2012):
-- Minimum useful area (36 m² for segunda ocupación)
+- Minimum useful area (30 m² for primera ocupación, 36 m² for segunda ocupación/renovation)
 - Minimum ceiling height (2.5m)
 - Required facilities (kitchen, bathroom)
 - Natural light and ventilation
-- Occupancy density
+- Occupancy density (9 m² per person minimum)
+- Minimum number of rooms
 - Heating system
 
 Each rule returns: severity (pass/risk/fail/unknown), explanation, fix guidance, confidence (0-100%).
