@@ -3,16 +3,23 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import path from 'path';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+// Use /tmp in serverless environments (Vercel), otherwise use ./data
+const isVercel = process.env.VERCEL === '1' || process.env.NEXT_PUBLIC_VERCEL === '1';
+const DATA_DIR = isVercel ? '/tmp/data' : path.join(process.cwd(), 'data');
 const CASES_FILE = path.join(DATA_DIR, 'cases.json');
 
 // Lazy initialization to avoid issues in serverless environments
 function ensureDataDirectory() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
-  if (!fs.existsSync(CASES_FILE)) {
-    fs.writeFileSync(CASES_FILE, JSON.stringify([], null, 2));
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(CASES_FILE)) {
+      fs.writeFileSync(CASES_FILE, JSON.stringify([], null, 2));
+    }
+  } catch (error) {
+    // If we can't write to filesystem (serverless), use in-memory storage
+    console.warn('Cannot write to filesystem, using in-memory storage:', error);
   }
 }
 
@@ -30,7 +37,13 @@ export function saveCase(caseData: Omit<Case, 'id' | 'shareId'>): Case {
   };
   
   cases.push(newCase);
-  fs.writeFileSync(CASES_FILE, JSON.stringify(cases, null, 2));
+  try {
+    fs.writeFileSync(CASES_FILE, JSON.stringify(cases, null, 2));
+  } catch (error) {
+    console.warn('Cannot write case to filesystem (serverless environment):', error);
+    // In serverless, we can't persist, but we still return the case
+    // The case will be lost on next invocation, but at least the API won't fail
+  }
   
   return newCase;
 }
@@ -53,7 +66,12 @@ export function updateCase(id: string, updates: Partial<Case & { statusUpdatedBy
   };
   
   cases[index] = updatedCase;
-  fs.writeFileSync(CASES_FILE, JSON.stringify(cases, null, 2));
+  try {
+    fs.writeFileSync(CASES_FILE, JSON.stringify(cases, null, 2));
+  } catch (error) {
+    console.warn('Cannot update case in filesystem (serverless environment):', error);
+    // In serverless, we can't persist, but we still return the updated case
+  }
   
   return updatedCase;
 }

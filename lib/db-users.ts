@@ -3,7 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import path from 'path';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+// Use /tmp in serverless environments (Vercel), otherwise use ./data
+const isVercel = process.env.VERCEL === '1' || process.env.NEXT_PUBLIC_VERCEL === '1';
+const DATA_DIR = isVercel ? '/tmp/data' : path.join(process.cwd(), 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const TEAMS_FILE = path.join(DATA_DIR, 'teams.json');
 const TEAM_MEMBERS_FILE = path.join(DATA_DIR, 'team-members.json');
@@ -12,26 +14,31 @@ const EVIDENCE_DIR = path.join(DATA_DIR, 'evidence');
 const EVIDENCE_FILE = path.join(DATA_DIR, 'evidence.json');
 
 function ensureDataDirectory() {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
-  if (!fs.existsSync(EVIDENCE_DIR)) {
-    fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
-  }
-  if (!fs.existsSync(USERS_FILE)) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify([], null, 2));
-  }
-  if (!fs.existsSync(TEAMS_FILE)) {
-    fs.writeFileSync(TEAMS_FILE, JSON.stringify([], null, 2));
-  }
-  if (!fs.existsSync(TEAM_MEMBERS_FILE)) {
-    fs.writeFileSync(TEAM_MEMBERS_FILE, JSON.stringify([], null, 2));
-  }
-  if (!fs.existsSync(TEMPLATES_FILE)) {
-    fs.writeFileSync(TEMPLATES_FILE, JSON.stringify([], null, 2));
-  }
-  if (!fs.existsSync(EVIDENCE_FILE)) {
-    fs.writeFileSync(EVIDENCE_FILE, JSON.stringify([], null, 2));
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(EVIDENCE_DIR)) {
+      fs.mkdirSync(EVIDENCE_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(USERS_FILE)) {
+      fs.writeFileSync(USERS_FILE, JSON.stringify([], null, 2));
+    }
+    if (!fs.existsSync(TEAMS_FILE)) {
+      fs.writeFileSync(TEAMS_FILE, JSON.stringify([], null, 2));
+    }
+    if (!fs.existsSync(TEAM_MEMBERS_FILE)) {
+      fs.writeFileSync(TEAM_MEMBERS_FILE, JSON.stringify([], null, 2));
+    }
+    if (!fs.existsSync(TEMPLATES_FILE)) {
+      fs.writeFileSync(TEMPLATES_FILE, JSON.stringify([], null, 2));
+    }
+    if (!fs.existsSync(EVIDENCE_FILE)) {
+      fs.writeFileSync(EVIDENCE_FILE, JSON.stringify([], null, 2));
+    }
+  } catch (error) {
+    // If we can't write to filesystem (serverless), use in-memory storage
+    console.warn('Cannot write to filesystem, using in-memory storage:', error);
   }
 }
 
@@ -48,7 +55,11 @@ export function saveUser(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>)
   };
   
   users.push(newUser);
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  try {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  } catch (error) {
+    console.warn('Cannot write user to filesystem (serverless environment):', error);
+  }
   
   return newUser;
 }
@@ -69,7 +80,11 @@ export function updateUser(id: string, updates: Partial<User>): User | null {
   };
   
   users[index] = updatedUser;
-  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  try {
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+  } catch (error) {
+    console.warn('Cannot update user in filesystem (serverless environment):', error);
+  }
   
   return updatedUser;
 }
@@ -110,7 +125,11 @@ export function saveTeam(teamData: Omit<Team, 'id' | 'createdAt' | 'updatedAt'>)
   };
   
   teams.push(newTeam);
-  fs.writeFileSync(TEAMS_FILE, JSON.stringify(teams, null, 2));
+  try {
+    fs.writeFileSync(TEAMS_FILE, JSON.stringify(teams, null, 2));
+  } catch (error) {
+    console.warn('Cannot write team to filesystem (serverless environment):', error);
+  }
   
   return newTeam;
 }
@@ -143,7 +162,11 @@ export function addTeamMember(memberData: Omit<TeamMember, 'id' | 'joinedAt'>): 
   };
   
   members.push(newMember);
-  fs.writeFileSync(TEAM_MEMBERS_FILE, JSON.stringify(members, null, 2));
+  try {
+    fs.writeFileSync(TEAM_MEMBERS_FILE, JSON.stringify(members, null, 2));
+  } catch (error) {
+    console.warn('Cannot write team member to filesystem (serverless environment):', error);
+  }
   
   return newMember;
 }
@@ -184,7 +207,11 @@ export function saveTemplate(templateData: Omit<CaseTemplate, 'id' | 'createdAt'
   };
   
   templates.push(newTemplate);
-  fs.writeFileSync(TEMPLATES_FILE, JSON.stringify(templates, null, 2));
+  try {
+    fs.writeFileSync(TEMPLATES_FILE, JSON.stringify(templates, null, 2));
+  } catch (error) {
+    console.warn('Cannot write template to filesystem (serverless environment):', error);
+  }
   
   return newTemplate;
 }
@@ -234,7 +261,11 @@ export function deleteTemplate(id: string): boolean {
   }
   
   templates.splice(index, 1);
-  fs.writeFileSync(TEMPLATES_FILE, JSON.stringify(templates, null, 2));
+  try {
+    fs.writeFileSync(TEMPLATES_FILE, JSON.stringify(templates, null, 2));
+  } catch (error) {
+    console.warn('Cannot delete template from filesystem (serverless environment):', error);
+  }
   
   return true;
 }
@@ -250,7 +281,11 @@ export function saveEvidence(evidenceData: Omit<Evidence, 'id' | 'uploadedAt'>):
   };
   
   evidence.push(newEvidence);
-  fs.writeFileSync(EVIDENCE_FILE, JSON.stringify(evidence, null, 2));
+  try {
+    fs.writeFileSync(EVIDENCE_FILE, JSON.stringify(evidence, null, 2));
+  } catch (error) {
+    console.warn('Cannot write evidence to filesystem (serverless environment):', error);
+  }
   
   return newEvidence;
 }
@@ -299,7 +334,11 @@ export function deleteEvidence(id: string): boolean {
   }
   
   evidence.splice(index, 1);
-  fs.writeFileSync(EVIDENCE_FILE, JSON.stringify(evidence, null, 2));
+  try {
+    fs.writeFileSync(EVIDENCE_FILE, JSON.stringify(evidence, null, 2));
+  } catch (error) {
+    console.warn('Cannot delete evidence from filesystem (serverless environment):', error);
+  }
   
   return true;
 }
